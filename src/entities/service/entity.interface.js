@@ -1,13 +1,17 @@
 export class IEntityService {
   entityTransport;
+  createForm;
+  editForm;
 
-  constructor (entityTransport) {
+  constructor (entityTransport, createForm, editForm) {
     this.entityTransport = entityTransport;
+    this.createForm = createForm;
+    this.editForm = editForm;
   }
 
-  create(createForm) {
-    if (createForm.validate()) {
-      return this.entityTransport.create(createForm.values);
+  create() {
+    if (this.createForm.validate()) {
+      return this.entityTransport.create(this.createForm.values);
     }
   }
 
@@ -15,14 +19,14 @@ export class IEntityService {
     return this.entityTransport.read(data);
   }
 
-  update(editForm, entityModel) {
-    if (editForm.validate()) {
-      return this.entityTransport.update(editForm.values).then(payload => {
+  update(entityModel) {
+    if (this.editForm.validate()) {
+      return this.entityTransport.update(this.editForm.values).then(payload => {
         if (entityModel === undefined) {
           return payload;
         }
 
-        entityModel.update(editForm.values);
+        entityModel.update(this.editForm.values);
         return payload;
       });
     }
