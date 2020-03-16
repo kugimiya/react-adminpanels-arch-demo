@@ -10,11 +10,11 @@ export class ITransport {
       })
       .then(response => {
         if (response.data.error === undefined || response.data.error === null) {
-          reject(response.data.error);
+          resolve(response.data.payload);
           return;
         }
 
-        resolve(response.data.payload);
+        reject(response.data.error);
       })
       .catch(err => reject(err));
     });

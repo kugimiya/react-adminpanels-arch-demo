@@ -1,6 +1,9 @@
+import { ICollectionModel } from './model/collection.interface';
 import { IFormModel } from './model/form.iterface';
 import { IEntityModel } from './model/entity.interface';
+import { ICollectionService } from './service/collection.interface';
 import { IEntityService } from './service/entity.interface';
+import { ICollectionTransport } from './transport/collection.interface';
 import { IEntityTransport } from './transport/entity.interface';
 
 // Схема сущности
@@ -31,6 +34,24 @@ const UserTransportScheme = {
       role_id: formData.roleId,
     });
   }
+};
+
+const UsersCollectionTransportScheme = {
+  baseUri: 'http://localhost:3030/users',
+  readPostProcess: (err, payload, data) => {
+    console.log({ err, payload, data });
+
+    return payload.users.map(u => ({
+      id: u.user_id,
+      firstName: u.firstname,
+      lastName: u.lastname,
+      middleName: u.middlename,
+      status: u.status,
+      roleId: u.role_id,
+      login: u.login
+    }));
+  },
+  readPreProcess: data => data
 };
 
 // Хранилище данных сущности (для React-компонент)
@@ -69,4 +90,31 @@ class UserService extends IEntityService {
 export class UserEntity {
   service = new UserService(); // Тут React-компоненты могут командовать сущностью
   model = new UserModel();     // Тут они берут её данные
+}
+
+/* Далее коллекция юзеров */
+class UsersCollectionTransport extends ICollectionTransport {
+  constructor () {
+    super(UsersCollectionTransportScheme);
+  }
+}
+
+class UsersCollectionService extends ICollectionService {
+  constructor () {
+    super(
+      new UsersCollectionTransport(),
+      new UserService()
+    );
+  }
+}
+
+class UsersCollectionModel extends ICollectionModel {
+  constructor () {
+    super(UserEntityScheme, UserModel);
+  }
+}
+
+export class UsersCollectionEntity {
+  service = new UsersCollectionService();
+  model = new UsersCollectionModel();
 }

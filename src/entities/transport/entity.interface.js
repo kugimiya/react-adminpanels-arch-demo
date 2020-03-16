@@ -61,6 +61,7 @@ export class IEntityTransport extends ITransport {
       if (postHook !== undefined) {
         return postHook(null, payload, data);
       }
+      return payload;
     } catch (error) {
       if (postHook !== undefined) {
         return postHook(error);
